@@ -1,13 +1,33 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
-import { User, MapPin, Clock, Briefcase, Check, Minus, Plus, ChevronLeft, ChevronRight, Wifi, Tv, Wind, Bluetooth, Search, GripVertical, X, Edit, Trash2 } from "lucide-react";
-import { format } from "date-fns";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { format } from "date-fns";
+import {
+  MapPin,
+  User,
+  Briefcase,
+  Plus,
+  Minus,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Wifi,
+  Tv,
+  Wind,
+  Bluetooth,
+  Clock,
+  Edit,
+  GripVertical,
+  Search,
+  Trash2,
+  Check,
+} from "lucide-react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
 import { Input } from "./ui/input";
+import { Calendar } from "./ui/calendar";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { GooglePlacesAutocomplete } from "./GooglePlacesAutocomplete";
 import {
@@ -272,6 +292,13 @@ function VehicleSelectionContent() {
   const [tempPassengers, setTempPassengers] = useState("1");
   const [tempLuggage, setTempLuggage] = useState(2);
 
+  // Date edit states
+  const [isEditingDate, setIsEditingDate] = useState(false);
+  const [tempDateRange, setTempDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
+  const [tempIsFlexibleDates, setTempIsFlexibleDates] = useState(false);
+  const [tempSelectedMonth, setTempSelectedMonth] = useState("");
+  const [tempNumberOfDays, setTempNumberOfDays] = useState("");
+
   // Tab management states
   const [activeTabId, setActiveTabId] = useState<string>("trip-1");
   const [tripRecords, setTripRecords] = useState<Record<string, {
@@ -474,6 +501,60 @@ function VehicleSelectionContent() {
     setTempPassengers(tripData.passengers);
     setTempLuggage(luggageCount);
     setIsEditingPassengerDetails(false);
+  };
+
+  const handleStartEditDate = () => {
+    // Store current values in temp states
+    if (tripData.dateRange.from && tripData.dateRange.to) {
+      setTempDateRange({
+        from: new Date(tripData.dateRange.from),
+        to: new Date(tripData.dateRange.to),
+      });
+    } else {
+      setTempDateRange({ from: undefined, to: undefined });
+    }
+    setTempIsFlexibleDates(tripData.isFlexibleDates);
+    setTempSelectedMonth(tripData.selectedMonth);
+    setTempNumberOfDays(tripData.numberOfDays);
+    setIsEditingDate(true);
+  };
+
+  const handleSaveDate = () => {
+    const updatedTripData = {
+      ...tripData,
+      dateRange: {
+        from: tempDateRange.from?.toISOString(),
+        to: tempDateRange.to?.toISOString(),
+      },
+      isFlexibleDates: tempIsFlexibleDates,
+      selectedMonth: tempSelectedMonth,
+      numberOfDays: tempNumberOfDays,
+    };
+    setTripData(updatedTripData);
+    sessionStorage.setItem("tripData", JSON.stringify(updatedTripData));
+    setIsEditingDate(false);
+  };
+
+  const handleCancelDate = () => {
+    // Reset temp values
+    if (tripData.dateRange.from && tripData.dateRange.to) {
+      setTempDateRange({
+        from: new Date(tripData.dateRange.from),
+        to: new Date(tripData.dateRange.to),
+      });
+    } else {
+      setTempDateRange({ from: undefined, to: undefined });
+    }
+    setTempIsFlexibleDates(tripData.isFlexibleDates);
+    setTempSelectedMonth(tripData.selectedMonth);
+    setTempNumberOfDays(tripData.numberOfDays);
+    setIsEditingDate(false);
+  };
+
+  const handleUndecided = () => {
+    // Revert to flexible dates with original values
+    setTempDateRange({ from: undefined, to: undefined });
+    setTempIsFlexibleDates(true);
   };
 
   const handleCreateNewTrip = () => {
@@ -823,25 +904,79 @@ function VehicleSelectionContent() {
 
               {/* Date */}
               {!isDraftTab && (
-                <div className="pt-4 mt-4 border-t">
-                  <div className="text-sm text-gray-600">Date</div>
-                  <div className="font-medium">
-                    {tripData.isFlexibleDates ? (
-                      `${tripData.selectedMonth} (${tripData.numberOfDays})`
-                    ) : tripData.dateRange.from && tripData.dateRange.to ? (
-                      `${format(new Date(tripData.dateRange.from), "MMM dd")} - ${format(new Date(tripData.dateRange.to), "MMM dd")}`
-                    ) : (
-                      "Dates not specified"
+                <div className="border border-gray-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-gray-700">Date</div>
+                    {!isEditingDate && !isEditMode && (
+                      <button
+                        onClick={handleStartEditDate}
+                        className="text-blue-600 hover:text-blue-700 p-1"
+                      >
+                        <Edit className="size-4" />
+                      </button>
+                    )}
+                    {isEditingDate && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleCancelDate}
+                          className="text-xs px-2 py-1 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleSaveDate}
+                          className="text-xs px-2 py-1 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
+                        >
+                          Save
+                        </button>
+                      </div>
                     )}
                   </div>
+
+                  {isEditingDate ? (
+                    <div className="space-y-3">
+                      <Calendar
+                        mode="range"
+                        selected={{ from: tempDateRange.from, to: tempDateRange.to }}
+                        onSelect={(range) => {
+                          if (range) {
+                            setTempDateRange({ from: range.from, to: range.to });
+                            setTempIsFlexibleDates(false);
+                          }
+                        }}
+                        numberOfMonths={1}
+                        defaultMonth={
+                          tripData.isFlexibleDates && tripData.selectedMonth
+                            ? new Date(2026, ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].indexOf(tripData.selectedMonth), 1)
+                            : tempDateRange.from || new Date()
+                        }
+                      />
+                      <button
+                        onClick={handleUndecided}
+                        className="w-full py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                      >
+                        Undecided
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="font-medium">
+                      {tripData.isFlexibleDates ? (
+                        `${tripData.selectedMonth} (Day ${tripData.numberOfDays.split(' ')[0]})`
+                      ) : tripData.dateRange.from && tripData.dateRange.to ? (
+                        `${format(new Date(tripData.dateRange.from), "MMM dd")} - ${format(new Date(tripData.dateRange.to), "MMM dd")}`
+                      ) : (
+                        "Dates not specified"
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Passenger Details */}
               {!isDraftTab && (
-                <div className="mt-4 pt-4 border-t">
+                <div className="border border-gray-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-between mb-3">
-                    <div className="text-sm text-gray-600">Passenger Details</div>
+                    <div className="text-sm font-semibold text-gray-700">Passenger Details</div>
                     {!isEditingPassengerDetails && !isEditMode && (
                       <button
                         onClick={handleStartEditPassengerDetails}
@@ -1023,8 +1158,16 @@ function VehicleSelectionContent() {
 
             {Object.keys(selectedVehicles).length > 0 && (
               <div className="mt-6">
-                <Button size="lg" className="w-full md:w-auto">
-                  Continue with selected vehicles
+                <Button 
+                  size="lg" 
+                  className="w-full md:w-auto"
+                  onClick={() => {
+                    sessionStorage.setItem("selectedVehicles", JSON.stringify(selectedVehicles));
+                    sessionStorage.setItem("additionalDestinations", JSON.stringify(additionalDestinations));
+                    navigate("/booking");
+                  }}
+                >
+                  Continue to Booking
                 </Button>
               </div>
             )}

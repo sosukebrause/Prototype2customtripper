@@ -30,7 +30,7 @@ export function CreateTripForm() {
   const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
   const [isFlexibleDates, setIsFlexibleDates] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState("Feb");
-  const [numberOfDays, setNumberOfDays] = useState("2 days");
+  const [numberOfDays, setNumberOfDays] = useState("1 day");
   const [passengers, setPassengers] = useState("1");
 
   const isFormValid = destination && (
