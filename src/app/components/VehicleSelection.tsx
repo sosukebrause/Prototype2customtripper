@@ -58,6 +58,7 @@ type VehicleOption = {
   hourlyRate: number;
   fullDayRate: number;
   imageUrl: string;
+  images: string[];
   passengerCapacity: number;
   luggageCapacity: number;
   features: string[];
@@ -78,6 +79,11 @@ const vehicles: VehicleOption[] = [
     hourlyRate: 95,
     fullDayRate: 420,
     imageUrl: "https://images.unsplash.com/photo-1692279952778-00ce5c3ce02c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBjb21mb3J0JTIwdmFufGVufDF8fHx8MTc3MTkxNDQ3Nnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    images: [
+      "https://images.unsplash.com/photo-1692279952778-00ce5c3ce02c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBjb21mb3J0JTIwdmFufGVufDF8fHx8MTc3MTkxNDQ3Nnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1547731269-e4073e054f12?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBjb21mb3J0JTIwdmFuJTIwaW50ZXJpb3J8ZW58MXx8fHwxNzcxOTk3Nzg0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1771248647341-9d8f567b051d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB2YW4lMjB0cmFuc3BvcnRhdGlvbnxlbnwxfHx8fDE3NzE5MTQ0ODB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    ],
     passengerCapacity: 7,
     luggageCapacity: 4,
     features: ["WiFi", "TV", "2-Zone Climate", "Bluetooth"],
@@ -89,6 +95,11 @@ const vehicles: VehicleOption[] = [
     hourlyRate: 110,
     fullDayRate: 580,
     imageUrl: "https://images.unsplash.com/photo-1771248647341-9d8f567b051d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB2YW4lMjB0cmFuc3BvcnRhdGlvbnxlbnwxfHx8fDE3NzE5MTQ0ODB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    images: [
+      "https://images.unsplash.com/photo-1771248647341-9d8f567b051d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB2YW4lMjB0cmFuc3BvcnRhdGlvbnxlbnwxfHx8fDE3NzE5MTQ0ODB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1692279952778-00ce5c3ce02c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBjb21mb3J0JTIwdmFufGVufDF8fHx8MTc3MTkxNDQ3Nnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1547731269-e4073e054f12?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBjb21mb3J0JTIwdmFuJTIwaW50ZXJpb3J8ZW58MXx8fHwxNzcxOTk3Nzg0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    ],
     passengerCapacity: 7,
     luggageCapacity: 5,
     features: ["WiFi", "TV", "2-Zone Climate", "Bluetooth"],
@@ -100,6 +111,11 @@ const vehicles: VehicleOption[] = [
     hourlyRate: 125,
     fullDayRate: 650,
     imageUrl: "https://images.unsplash.com/photo-1763789381177-cd8a04aaa2ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzZWRhbiUyMGNhcnxlbnwxfHx8fDE3NzE4MjAyNTV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    images: [
+      "https://images.unsplash.com/photo-1763789381177-cd8a04aaa2ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzZWRhbiUyMGNhcnxlbnwxfHx8fDE3NzE4MjAyNTV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1547731269-e4073e054f12?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzZWRhbiUyMGludGVyaW9yJTIwbGVhdGhlcnxlbnwxfHx8fDE3NzE5OTc3ODR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1609465397944-be1ce3ebda61?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBjYXIlMjBpbnRlcmlvciUyMGRhc2hib2FyZHxlbnwxfHx8fDE3NzE5MzU4NDR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    ],
     passengerCapacity: 4,
     luggageCapacity: 3,
     features: ["WiFi", "TV", "2-Zone Climate", "Bluetooth"],
@@ -111,6 +127,11 @@ const vehicles: VehicleOption[] = [
     hourlyRate: 85,
     fullDayRate: 450,
     imageUrl: "https://images.unsplash.com/photo-1767949374180-e5895daa1990?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcm9zc292ZXIlMjBTVVYlMjB2ZWhpY2xlfGVufDF8fHx8MTc3MTkxNDQ3N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    images: [
+      "https://images.unsplash.com/photo-1767949374180-e5895daa1990?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcm9zc292ZXIlMjBTVVYlMjB2ZWhpY2xlfGVufDF8fHx8MTc3MTkxNDQ3N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1770287872690-45c8bd1e8d1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcm9zc292ZXIlMjBTVVYlMjBzaWRlJTIwdmlld3xlbnwxfHx8fDE3NzE5OTc3ODV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1613560135482-7945bae4d9ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxTVVYlMjB2ZWhpY2xlJTIwcmVhcnxlbnwxfHx8fDE3NzE5OTc3ODh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    ],
     passengerCapacity: 5,
     luggageCapacity: 3,
     features: ["WiFi", "TV", "2-Zone Climate", "Bluetooth"],
@@ -305,26 +326,76 @@ function VehicleSelectionContent() {
     tripData: TripData;
     additionalDestinations: string[];
     selectedVehicles: Record<string, number>;
-  }>>({});
+  }>>(() => {
+    // Load trip records from sessionStorage on mount
+    const savedRecords = sessionStorage.getItem("tripRecords");
+    return savedRecords ? JSON.parse(savedRecords) : {};
+  });
   const [isDraftTab, setIsDraftTab] = useState(false);
   const [isDiscardDialogOpen, setIsDiscardDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [draftStartLocation, setDraftStartLocation] = useState("");
   const [draftDestination, setDraftDestination] = useState("");
 
+  // Vehicle image carousel states
+  const [vehicleImageIndices, setVehicleImageIndices] = useState<Record<string, number>>({});
+
+  // Save tripRecords to sessionStorage whenever it changes
+  useEffect(() => {
+    if (Object.keys(tripRecords).length > 0) {
+      sessionStorage.setItem("tripRecords", JSON.stringify(tripRecords));
+    }
+  }, [tripRecords]);
+
   useEffect(() => {
     const data = sessionStorage.getItem("tripData");
     if (data) {
       const parsed = JSON.parse(data);
-      setTripData(parsed);
       
-      // Initialize locations
-      const initialLocations: LocationItem[] = [
-        { id: "start", label: parsed.startLocation, isStartLocation: true },
-        { id: "destination", label: parsed.destination, isMainDestination: true },
-      ];
-      setLocations(initialLocations);
-      setOriginalLocations(initialLocations);
+      // If trip-1 already exists in tripRecords, use that data instead
+      if (tripRecords["trip-1"]) {
+        const trip1Data = tripRecords["trip-1"];
+        setTripData(trip1Data.tripData);
+        setAdditionalDestinations(trip1Data.additionalDestinations);
+        setSelectedVehicles(trip1Data.selectedVehicles);
+        
+        // Initialize locations from trip1Data
+        const baseLocations: LocationItem[] = [
+          { id: "start", label: trip1Data.tripData.startLocation, isStartLocation: true },
+          { id: "destination", label: trip1Data.tripData.destination, isMainDestination: true },
+        ];
+        const additionalLocs = trip1Data.additionalDestinations.map((dest, index) => ({
+          id: `additional-${index}`,
+          label: dest,
+        }));
+        setLocations([...baseLocations, ...additionalLocs]);
+        setOriginalLocations([...baseLocations, ...additionalLocs]);
+      } else {
+        // First time loading - initialize from parsed data and ensure it has "Trip 1" name
+        const initialTripData = {
+          ...parsed,
+          tripName: parsed.tripName || "Trip 1",
+        };
+        setTripData(initialTripData);
+        
+        // Initialize locations
+        const initialLocations: LocationItem[] = [
+          { id: "start", label: initialTripData.startLocation, isStartLocation: true },
+          { id: "destination", label: initialTripData.destination, isMainDestination: true },
+        ];
+        setLocations(initialLocations);
+        setOriginalLocations(initialLocations);
+        
+        // Initialize trip-1 in tripRecords
+        setTripRecords(prev => ({
+          ...prev,
+          "trip-1": {
+            tripData: initialTripData,
+            additionalDestinations: [],
+            selectedVehicles: {},
+          }
+        }));
+      }
     } else {
       navigate("/");
     }
@@ -520,11 +591,15 @@ function VehicleSelectionContent() {
   };
 
   const handleSaveDate = () => {
+    // If only 'from' date is selected, use it for both 'from' and 'to'
+    const fromDate = tempDateRange.from;
+    const toDate = tempDateRange.to || tempDateRange.from;
+    
     const updatedTripData = {
       ...tripData,
       dateRange: {
-        from: tempDateRange.from?.toISOString(),
-        to: tempDateRange.to?.toISOString(),
+        from: fromDate?.toISOString(),
+        to: toDate?.toISOString(),
       },
       isFlexibleDates: tempIsFlexibleDates,
       selectedMonth: tempSelectedMonth,
@@ -573,7 +648,7 @@ function VehicleSelectionContent() {
     // Create new trip with default data
     const newTripId = `trip-${Date.now()}`;
     const defaultTripData: TripData = {
-      tripName: `Trip ${Object.keys(tripRecords).length + 2}`,
+      tripName: `Trip ${Object.keys(tripRecords).length + 1}`,
       startLocation: "",
       destination: "",
       dateRange: { from: undefined, to: undefined },
@@ -671,14 +746,27 @@ function VehicleSelectionContent() {
       }
     }));
 
-    // Load selected trip
+    // Load selected trip from records
     const selectedTrip = tripRecords[tabId];
     if (selectedTrip) {
       setTripData(selectedTrip.tripData);
       setAdditionalDestinations(selectedTrip.additionalDestinations);
       setSelectedVehicles(selectedTrip.selectedVehicles);
+      
+      // Update locations based on the loaded trip data
+      const baseLocations: LocationItem[] = [
+        { id: "start", label: selectedTrip.tripData.startLocation, isStartLocation: true },
+        { id: "destination", label: selectedTrip.tripData.destination, isMainDestination: true },
+      ];
+      const additionalLocs = selectedTrip.additionalDestinations.map((dest, index) => ({
+        id: `additional-${index}`,
+        label: dest,
+      }));
+      setLocations([...baseLocations, ...additionalLocs]);
+      setOriginalLocations([...baseLocations, ...additionalLocs]);
     }
     setActiveTabId(tabId);
+    setIsDraftTab(false);
   };
 
   const handleDeleteTrip = () => {
@@ -708,6 +796,22 @@ function VehicleSelectionContent() {
     }
     
     setIsDeleteDialogOpen(false);
+  };
+
+  const handlePrevImage = (vehicleId: string, imagesLength: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setVehicleImageIndices(prev => ({
+      ...prev,
+      [vehicleId]: ((prev[vehicleId] || 0) - 1 + imagesLength) % imagesLength
+    }));
+  };
+
+  const handleNextImage = (vehicleId: string, imagesLength: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setVehicleImageIndices(prev => ({
+      ...prev,
+      [vehicleId]: ((prev[vehicleId] || 0) + 1) % imagesLength
+    }));
   };
 
   const tabIds = ["trip-1"];
@@ -1067,6 +1171,8 @@ function VehicleSelectionContent() {
               {vehicles.map((vehicle) => {
                 const isSelected = !!selectedVehicles[vehicle.id];
                 const quantity = selectedVehicles[vehicle.id] || 0;
+                const currentImageIndex = vehicleImageIndices[vehicle.id] || 0;
+                const currentImage = vehicle.images[currentImageIndex] || vehicle.imageUrl;
                 
                 return (
                   <Card
@@ -1075,12 +1181,34 @@ function VehicleSelectionContent() {
                       isSelected ? "ring-2 ring-green-500" : ""
                     }`}
                   >
-                    <div className="relative aspect-video w-full overflow-hidden bg-black">
+                    <div className="relative aspect-video w-full overflow-hidden bg-black group">
                       <ImageWithFallback
-                        src={vehicle.imageUrl}
+                        src={currentImage}
                         alt={vehicle.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover cursor-pointer"
+                        onClick={() => openDetails(vehicle)}
                       />
+                      
+                      {/* Left Arrow - Only show if more than 1 image */}
+                      {vehicle.images.length > 1 && (
+                        <button
+                          onClick={(e) => handlePrevImage(vehicle.id, vehicle.images.length, e)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 size-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        >
+                          <ChevronLeft className="size-5 text-gray-800" />
+                        </button>
+                      )}
+                      
+                      {/* Right Arrow - Only show if more than 1 image */}
+                      {vehicle.images.length > 1 && (
+                        <button
+                          onClick={(e) => handleNextImage(vehicle.id, vehicle.images.length, e)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 size-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        >
+                          <ChevronRight className="size-5 text-gray-800" />
+                        </button>
+                      )}
+                      
                       <div
                         className="absolute top-3 right-3 size-8 rounded-full bg-white flex items-center justify-center cursor-pointer"
                         onClick={(e) => {
@@ -1156,21 +1284,71 @@ function VehicleSelectionContent() {
               })}
             </div>
 
-            {Object.keys(selectedVehicles).length > 0 && (
-              <div className="mt-6">
-                <Button 
-                  size="lg" 
-                  className="w-full md:w-auto"
-                  onClick={() => {
-                    sessionStorage.setItem("selectedVehicles", JSON.stringify(selectedVehicles));
-                    sessionStorage.setItem("additionalDestinations", JSON.stringify(additionalDestinations));
-                    navigate("/booking");
-                  }}
-                >
-                  Continue to Booking
-                </Button>
-              </div>
-            )}
+            <div className="mt-6 flex flex-col md:flex-row gap-3">
+              <Button 
+                size="lg" 
+                className="w-full md:w-auto"
+                disabled={Object.keys(selectedVehicles).length === 0}
+                onClick={() => {
+                  sessionStorage.setItem("selectedVehicles", JSON.stringify(selectedVehicles));
+                  sessionStorage.setItem("additionalDestinations", JSON.stringify(additionalDestinations));
+                  navigate("/booking");
+                }}
+              >
+                Continue to Booking
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="w-full md:w-auto"
+                onClick={() => {
+                  // Generate unique ID for the trip
+                  const tripId = `trip-${Date.now()}`;
+                  
+                  // Count vehicles
+                  const vehicleCount = Object.values(selectedVehicles).reduce(
+                    (sum, count) => sum + (typeof count === 'number' ? count : 0),
+                    0
+                  );
+                  
+                  // Create trip object matching Dashboard Trip type
+                  const newTrip = {
+                    id: tripId,
+                    tripName: tripData.tripName,
+                    startLocation: tripData.startLocation,
+                    destination: tripData.destination,
+                    dateRange: tripData.dateRange,
+                    isFlexibleDates: tripData.isFlexibleDates,
+                    selectedMonth: tripData.selectedMonth,
+                    numberOfDays: tripData.numberOfDays,
+                    passengers: tripData.passengers,
+                    vehicleCount: vehicleCount,
+                    status: "draft",
+                    createdAt: new Date().toISOString(),
+                  };
+                  
+                  // Load existing trips from localStorage
+                  const existingTripsJson = localStorage.getItem("savedTrips");
+                  const existingTrips = existingTripsJson ? JSON.parse(existingTripsJson) : [];
+                  
+                  // Add new trip to the list
+                  existingTrips.push(newTrip);
+                  
+                  // Save back to localStorage
+                  localStorage.setItem("savedTrips", JSON.stringify(existingTrips));
+                  
+                  // Also save current state to session storage for later continuation
+                  sessionStorage.setItem("selectedVehicles", JSON.stringify(selectedVehicles));
+                  sessionStorage.setItem("additionalDestinations", JSON.stringify(additionalDestinations));
+                  sessionStorage.setItem("tripData", JSON.stringify(tripData));
+                  
+                  // Navigate to dashboard
+                  navigate("/dashboard");
+                }}
+              >
+                Save & Continue Later
+              </Button>
+            </div>
           </div>
         </div>
       </div>

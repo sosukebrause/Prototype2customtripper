@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 
+const checkeredFlagImage = "https://images.unsplash.com/photo-1648907736562-b1cb3dd632dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxibGFjayUyMHdoaXRlJTIwY2hlY2tlcmVkJTIwcGF0dGVybiUyMHRleHR1cmV8ZW58MXx8fHwxNzcxOTk5NDkzfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
+
 type TripStatus = "draft" | "in-progress" | "changes-requested" | "approved" | "cancelled" | "done";
 
 type Trip = {
@@ -178,15 +180,24 @@ const statusConfig = {
   done: {
     label: "Done",
     color: "bg-green-100 text-green-700",
-    badgeColor: "bg-green-100 text-green-700 border-green-200",
-    iconBg: "bg-green-500",
-    icon: <CheckCircle className="size-3" />,
+    badgeColor: "text-gray-800 border-gray-300",
+    iconBg: "bg-gray-600",
+    icon: <Check className="size-3" />,
   },
 };
 
 export function Dashboard() {
   const navigate = useNavigate();
-  const [trips] = useState<Trip[]>(mockTrips);
+  
+  // Load trips from localStorage and merge with mock trips
+  const [trips, setTrips] = useState<Trip[]>(() => {
+    const savedTripsJson = localStorage.getItem("savedTrips");
+    const savedTrips = savedTripsJson ? JSON.parse(savedTripsJson) : [];
+    // Merge saved trips with mock trips, avoiding duplicates
+    const allTrips = [...savedTrips, ...mockTrips];
+    return allTrips;
+  });
+  
   const [filterStatus, setFilterStatus] = useState<TripStatus | "all">("all");
 
   const filteredTrips = filterStatus === "all" 
@@ -201,6 +212,26 @@ export function Dashboard() {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border bg-gray-100 text-gray-700 border-gray-200">
           {status}
+        </span>
+      );
+    }
+
+    // Special styling for "done" status with checkered flag background
+    if (status === "done") {
+      return (
+        <span 
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${config.badgeColor} relative overflow-hidden`}
+          style={{
+            backgroundImage: `url(${checkeredFlagImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          <span className="absolute inset-0 bg-white opacity-50 rounded-full"></span>
+          <span className={`size-5 rounded-full ${config.iconBg} flex items-center justify-center text-white relative z-10`}>
+            {config.icon}
+          </span>
+          <span className="relative z-10 font-semibold">{config.label}</span>
         </span>
       );
     }
@@ -414,13 +445,15 @@ export function Dashboard() {
                       View Details
                     </Button>
                   )}
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleEditTrip(trip.id)}
-                  >
-                    <Edit className="size-4" />
-                  </Button>
+                  {trip.status !== "draft" && trip.status !== "in-progress" && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleEditTrip(trip.id)}
+                    >
+                      <Edit className="size-4" />
+                    </Button>
+                  )}
                   <Button 
                     variant="outline" 
                     size="sm"
