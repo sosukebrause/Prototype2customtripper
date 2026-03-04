@@ -143,6 +143,7 @@ const vehicles: VehicleOption[] = [
 interface DraggableLocationProps {
   location: LocationItem;
   index: number;
+  totalLocations: number;
   moveLocation: (dragIndex: number, hoverIndex: number) => void;
   removeLocation: (index: number) => void;
   isEditMode: boolean;
@@ -157,6 +158,7 @@ interface DraggableLocationProps {
 function DraggableLocation({
   location,
   index,
+  totalLocations,
   moveLocation,
   removeLocation,
   isEditMode,
@@ -226,6 +228,16 @@ function DraggableLocation({
 
   return (
     <div ref={preview} style={{ opacity }} data-handler-id={handlerId}>
+      {index === 0 && (
+        <div className="text-sm font-semibold text-gray-700 mb-2">
+          Starting Point
+        </div>
+      )}
+      {index === totalLocations - 1 && (
+        <div className="text-sm font-semibold text-gray-700 mb-2">
+          Destination
+        </div>
+      )}
       <div className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg relative">
         {isEditMode && !isEditing && (
           <button
@@ -976,6 +988,7 @@ function VehicleSelectionContent() {
                           <DraggableLocation
                             location={location}
                             index={index}
+                            totalLocations={locations.length}
                             moveLocation={moveLocation}
                             removeLocation={removeLocation}
                             isEditMode={isEditMode}
@@ -1292,6 +1305,7 @@ function VehicleSelectionContent() {
                 onClick={() => {
                   sessionStorage.setItem("selectedVehicles", JSON.stringify(selectedVehicles));
                   sessionStorage.setItem("additionalDestinations", JSON.stringify(additionalDestinations));
+                  sessionStorage.setItem("luggageCount", String(luggageCount));
                   navigate("/booking");
                 }}
               >

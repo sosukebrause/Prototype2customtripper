@@ -237,12 +237,19 @@ export function Dashboard() {
     }
     
     return (
-      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${config.badgeColor}`}>
-        <span className={`size-5 rounded-full ${config.iconBg} flex items-center justify-center text-white`}>
-          {config.icon}
+      <div className="flex flex-col items-end gap-1.5">
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${config.badgeColor}`}>
+          <span className={`size-5 rounded-full ${config.iconBg} flex items-center justify-center text-white`}>
+            {config.icon}
+          </span>
+          {config.label === "In Progress" ? "Pending" : config.label}
         </span>
-        {config.label}
-      </span>
+        {config.label === "In Progress" && (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border bg-amber-50 text-amber-700 border-amber-300">
+            Awaiting Quote
+          </span>
+        )}
+      </div>
     );
   };
 
@@ -316,7 +323,7 @@ export function Dashboard() {
                     {config.icon}
                   </span>
                 )}
-                {status === "all" ? "All" : config?.label || status}
+                {status === "all" ? "All" : (config?.label === "In Progress" ? "Pending" : config?.label) || status}
                 {status !== "all" && (
                   <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
                     filterStatus === status 

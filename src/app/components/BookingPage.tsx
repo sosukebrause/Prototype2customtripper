@@ -91,21 +91,22 @@ export function BookingPage() {
   const [specialRequests, setSpecialRequests] = useState("");
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [estimatedHours] = useState(8); // Default to full day
+  const [luggageCount, setLuggageCount] = useState<number>(2);
 
   useEffect(() => {
     const data = sessionStorage.getItem("tripData");
-    const vehiclesData = sessionStorage.getItem(
-      "selectedVehicles",
-    );
-    const destData = sessionStorage.getItem(
-      "additionalDestinations",
-    );
+    const vehiclesData = sessionStorage.getItem("selectedVehicles");
+    const destData = sessionStorage.getItem("additionalDestinations");
+    const luggageData = sessionStorage.getItem("luggageCount");
 
     if (data && vehiclesData) {
       setTripData(JSON.parse(data));
       setSelectedVehicles(JSON.parse(vehiclesData));
       if (destData) {
         setAdditionalDestinations(JSON.parse(destData));
+      }
+      if (luggageData) {
+        setLuggageCount(parseInt(luggageData));
       }
     } else {
       navigate("/");
@@ -140,9 +141,39 @@ export function BookingPage() {
     // Generate booking reference
     const bookingRef = `BK${Date.now().toString().slice(-8)}`;
 
-    // Save booking data
+    // Save booking data to sessionStorage for confirmation page
     sessionStorage.setItem("bookingReference", bookingRef);
     sessionStorage.setItem("specialRequests", specialRequests);
+
+    // Build the trip record for the Dashboard
+    const vehicleCount = Object.values(selectedVehicles).reduce(
+      (sum, qty) => sum + qty,
+      0
+    );
+    const totalPrice = calculateTotalPrice();
+
+    const newTrip = {
+      id: `trip-${Date.now()}`,
+      bookingReference: bookingRef,
+      tripName: tripData!.tripName,
+      startLocation: tripData!.startLocation,
+      destination: tripData!.destination,
+      dateRange: tripData!.dateRange,
+      isFlexibleDates: tripData!.isFlexibleDates,
+      selectedMonth: tripData!.selectedMonth,
+      numberOfDays: tripData!.numberOfDays,
+      passengers: tripData!.passengers,
+      vehicleCount,
+      status: "in-progress",
+      createdAt: new Date().toISOString(),
+      totalPrice,
+    };
+
+    // Persist to localStorage so the Dashboard can display it
+    const existing = localStorage.getItem("savedTrips");
+    const savedTrips = existing ? JSON.parse(existing) : [];
+    savedTrips.unshift(newTrip);
+    localStorage.setItem("savedTrips", JSON.stringify(savedTrips));
 
     navigate("/confirmation");
   };
@@ -177,6 +208,8 @@ export function BookingPage() {
               <h2 className="text-lg font-semibold mb-4">
                 Trip Details
               </h2>
+
+              <p className="text-sm text-gray-500 -mt-2 mb-4">{tripData.tripName}</p>
 
               <div className="space-y-4">
                 {/* Route */}
@@ -226,34 +259,42 @@ export function BookingPage() {
                   </div>
                 </div>
 
-                {/* Date */}
-                <div className="flex items-center gap-3 pt-4 border-t">
-                  <Calendar className="size-5 text-gray-600" />
-                  <div>
-                    <div className="text-sm font-medium text-gray-700">
-                      Date
+                {/* Date / Passengers / Luggage — 3-column row */}
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                  {/* Column 1 — Date */}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Calendar className="size-4" />
+                      <span className="text-sm font-medium text-gray-700">Date</span>
                     </div>
                     <div className="text-sm">
                       {tripData.isFlexibleDates
                         ? `${tripData.selectedMonth} (${tripData.numberOfDays})`
-                        : tripData.dateRange.from &&
-                            tripData.dateRange.to
-                          ? `${format(new Date(tripData.dateRange.from), "MMM dd, yyyy")} - ${format(new Date(tripData.dateRange.to), "MMM dd, yyyy")}`
+                        : tripData.dateRange.from && tripData.dateRange.to
+                          ? `${format(new Date(tripData.dateRange.from), "MMM dd, yyyy")} – ${format(new Date(tripData.dateRange.to), "MMM dd, yyyy")}`
                           : "Dates not specified"}
                     </div>
                   </div>
-                </div>
 
-                {/* Passengers */}
-                <div className="flex items-center gap-3 pt-4 border-t">
-                  <User className="size-5 text-gray-600" />
-                  <div>
-                    <div className="text-sm font-medium text-gray-700">
-                      Passengers
+                  {/* Column 2 — Passengers */}
+                  <div className="flex flex-col gap-1 border-l pl-4">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <User className="size-4" />
+                      <span className="text-sm font-medium text-gray-700">Passengers</span>
                     </div>
                     <div className="text-sm">
-                      {tripData.passengers} Passenger
-                      {tripData.passengers !== "1" ? "s" : ""}
+                      {tripData.passengers} Passenger{tripData.passengers !== "1" ? "s" : ""}
+                    </div>
+                  </div>
+
+                  {/* Column 3 — Luggage */}
+                  <div className="flex flex-col gap-1 border-l pl-4">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Briefcase className="size-4" />
+                      <span className="text-sm font-medium text-gray-700">Luggage</span>
+                    </div>
+                    <div className="text-sm">
+                      {luggageCount} Bag{luggageCount !== 1 ? "s" : ""}
                     </div>
                   </div>
                 </div>
@@ -482,33 +523,80 @@ export function BookingPage() {
               <h2 className="text-lg font-semibold mb-4">
                 Terms & Conditions
               </h2>
-              <div className="text-sm text-gray-700 space-y-2 mb-4">
-                <p>
-                  By proceeding with this booking, you
-                  acknowledge and agree to the following:
+              <div className="text-sm text-gray-700 overflow-y-auto max-h-48 border border-gray-200 rounded-md p-4 space-y-3 mb-4 bg-gray-50">
+                <p className="text-gray-600 leading-relaxed">
+                  By entering your payment details and confirming your booking, you agree to the following Payment Authorization &amp; Collection Terms:
                 </p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>
-                    All bookings are subject to vehicle
-                    availability
-                  </li>
-                  <li>
-                    Cancellations must be made 24 hours in
-                    advance for a full refund
-                  </li>
-                  <li>
-                    Additional charges may apply for route
-                    changes or extended hours
-                  </li>
-                  <li>
-                    Payment information must be provided before
-                    final confirmation
-                  </li>
-                  <li>
-                    Prices are subject to change until booking
-                    is finalized
-                  </li>
-                </ul>
+                <div>
+                  <p className="font-semibold text-gray-800 mb-1">1. Deposit at Booking</p>
+                  <p className="text-gray-600 leading-relaxed">At the time of booking, you authorize Zengo to charge your selected payment method for a non-refundable deposit equal to 30% of the estimated total trip cost. This deposit secures your reservation and will be applied toward your final balance.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800 mb-1">2. Estimated Pricing</p>
+                  <p className="text-gray-600 leading-relaxed mb-1">The total price presented at checkout is an estimate based on the planned itinerary and services requested at the time of booking. Your final total may vary based on:</p>
+                  <ul className="list-disc list-inside space-y-0.5 ml-2 text-gray-600">
+                    <li>Actual duration of services</li>
+                    <li>Additional time or distance</li>
+                    <li>Extra stops or itinerary changes</li>
+                    <li>Additional services requested</li>
+                    <li>Applicable taxes, fees, tolls, or surcharges</li>
+                  </ul>
+                  <p className="text-gray-600 leading-relaxed mt-1">You agree to pay the final amount based on actual services provided.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800 mb-1">3. Authorization to Store Payment Method</p>
+                  <p className="text-gray-600 leading-relaxed mb-1">By submitting your payment details, you authorize Zengo to:</p>
+                  <ul className="list-disc list-inside space-y-0.5 ml-2 text-gray-600">
+                    <li>Securely store your payment method with our payment processor</li>
+                    <li>Retain it on file for the purpose of charging the remaining balance</li>
+                    <li>Use it for authorized future charges related to this booking</li>
+                  </ul>
+                  <p className="text-gray-600 leading-relaxed mt-1">Your payment information is stored securely by our payment processor and is not stored directly on our servers.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800 mb-1">4. Pre-Trip Authorization</p>
+                  <p className="text-gray-600 leading-relaxed mb-1">Because trips may be booked up to six (6) months in advance, you authorize us to perform a pre-authorization on your payment method approximately three (3) days before your scheduled trip date. This pre-authorization:</p>
+                  <ul className="list-disc list-inside space-y-0.5 ml-2 text-gray-600">
+                    <li>Is not an additional charge</li>
+                    <li>May temporarily reduce your available credit</li>
+                    <li>May appear as a pending transaction on your statement</li>
+                  </ul>
+                  <p className="text-gray-600 leading-relaxed mt-1">If the pre-authorization fails, we may contact you to provide an updated payment method. Failure to provide valid payment details may result in cancellation of your booking.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800 mb-1">5. Final Balance Charge (Post-Trip)</p>
+                  <p className="text-gray-600 leading-relaxed mb-1">You authorize Zengo to charge your saved payment method for the remaining balance one (1) day after completion of services. You acknowledge and agree that:</p>
+                  <ul className="list-disc list-inside space-y-0.5 ml-2 text-gray-600">
+                    <li>You will not be required to re-enter your card details</li>
+                    <li>The charge may be processed without additional action from you</li>
+                    <li>The final amount will reflect actual services rendered</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800 mb-1">6. Failed or Declined Payments</p>
+                  <p className="text-gray-600 leading-relaxed mb-1">If the final balance charge is declined:</p>
+                  <ul className="list-disc list-inside space-y-0.5 ml-2 text-gray-600">
+                    <li>We may retry the payment</li>
+                    <li>We may contact you to obtain an alternative payment method</li>
+                    <li>You remain responsible for any unpaid balance</li>
+                    <li>Additional administrative fees may apply where permitted by law</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800 mb-1">7. Disputes</p>
+                  <p className="text-gray-600 leading-relaxed">If you believe a charge was made in error, you agree to contact us directly at [support email/phone] before initiating a chargeback, so we may investigate and resolve the matter promptly.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800 mb-1">8. Acceptance of Terms</p>
+                  <p className="text-gray-600 leading-relaxed mb-1">By clicking "Confirm Booking" and entering your payment details, you:</p>
+                  <ul className="list-disc list-inside space-y-0.5 ml-2 text-gray-600">
+                    <li>Authorize the 30% deposit charge</li>
+                    <li>Authorize storage of your payment method</li>
+                    <li>Authorize pre-trip reauthorization</li>
+                    <li>Authorize post-trip off-session charging of the remaining balance</li>
+                    <li>Agree to pay the final amount based on actual services provided</li>
+                  </ul>
+                </div>
               </div>
 
               <div className="flex items-start gap-3">
@@ -528,6 +616,7 @@ export function BookingPage() {
                 </label>
               </div>
             </Card>
+
           </div>
 
           {/* Right Column - Pricing Summary */}
@@ -589,6 +678,16 @@ export function BookingPage() {
               >
                 Confirm Booking
               </Button>
+              <p className="text-xs text-gray-500 text-center mb-4">
+                You may modify this booking at any time up until three days prior to departure. Navigate to the{" "}
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="font-medium text-gray-700 hover:underline cursor-pointer"
+                >
+                  Trip Planner Dashboard
+                </button>{" "}
+                to do so.
+              </p>
 
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                 <div className="flex items-start gap-2 mb-2">
