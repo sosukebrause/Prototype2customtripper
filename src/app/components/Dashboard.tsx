@@ -3,6 +3,15 @@ import { useNavigate } from "react-router";
 import { Header } from "./Header";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "./ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { 
   MapPin, 
   Calendar, 
@@ -16,13 +25,30 @@ import {
   Edit2,
   FileText,
   X,
-  Check
+  Check,
+  Users
 } from "lucide-react";
 import { format } from "date-fns";
 
 const checkeredFlagImage = "https://images.unsplash.com/photo-1648907736562-b1cb3dd632dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxibGFjayUyMHdoaXRlJTIwY2hlY2tlcmVkJTIwcGF0dGVybiUyMHRleHR1cmV8ZW58MXx8fHwxNzcxOTk5NDkzfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 
 type TripStatus = "draft" | "in-progress" | "changes-requested" | "approved" | "cancelled" | "done";
+type PendingSubstatus = "awaiting-quote" | "awaiting-confirmation";
+
+type TripTab = {
+  tabId: string;
+  tabLabel: string;
+  startLocation: string;
+  destination: string;
+  additionalDestinations?: string[];
+  dateRange: { from: string | undefined; to: string | undefined };
+  isFlexibleDates: boolean;
+  selectedMonth: string;
+  numberOfDays: string;
+  passengers: string;
+  vehicleCount: number;
+  selectedVehicleNames?: string[];
+};
 
 type Trip = {
   id: string;
@@ -40,8 +66,10 @@ type Trip = {
   passengers: string;
   vehicleCount: number;
   status: TripStatus;
+  substatus?: PendingSubstatus;
   createdAt: string;
   totalPrice?: number;
+  tripTabs?: TripTab[];
 };
 
 // Mock data - in a real app, this would come from a backend
@@ -60,10 +88,55 @@ const mockTrips: Trip[] = [
     selectedMonth: "",
     numberOfDays: "",
     passengers: "3",
-    vehicleCount: 1,
+    vehicleCount: 3,
     status: "in-progress",
+    substatus: "awaiting-confirmation",
     createdAt: "2026-02-20T10:30:00.000Z",
     totalPrice: 504,
+    tripTabs: [
+      {
+        tabId: "trip-1",
+        tabLabel: "Trip 1",
+        startLocation: "Tokyo Station Hotel",
+        destination: "Narita International Airport",
+        additionalDestinations: [],
+        dateRange: { from: "2026-03-15T00:00:00.000Z", to: "2026-03-15T00:00:00.000Z" },
+        isFlexibleDates: false,
+        selectedMonth: "",
+        numberOfDays: "",
+        passengers: "3",
+        vehicleCount: 1,
+        selectedVehicleNames: ["Executive Sedan"],
+      },
+      {
+        tabId: "trip-2",
+        tabLabel: "Trip 2",
+        startLocation: "Narita International Airport",
+        destination: "Shibuya Grand Hotel",
+        additionalDestinations: ["Ginza Shopping District"],
+        dateRange: { from: "2026-03-17T00:00:00.000Z", to: "2026-03-17T00:00:00.000Z" },
+        isFlexibleDates: false,
+        selectedMonth: "",
+        numberOfDays: "",
+        passengers: "3",
+        vehicleCount: 1,
+        selectedVehicleNames: ["Executive Sedan"],
+      },
+      {
+        tabId: "trip-3",
+        tabLabel: "Trip 3",
+        startLocation: "Shibuya Grand Hotel",
+        destination: "Tokyo Station",
+        additionalDestinations: [],
+        dateRange: { from: "2026-03-20T00:00:00.000Z", to: "2026-03-20T00:00:00.000Z" },
+        isFlexibleDates: false,
+        selectedMonth: "",
+        numberOfDays: "",
+        passengers: "3",
+        vehicleCount: 1,
+        selectedVehicleNames: ["Luxury Van"],
+      },
+    ],
   },
   {
     id: "trip-2",
@@ -199,12 +272,13 @@ export function Dashboard() {
   });
   
   const [filterStatus, setFilterStatus] = useState<TripStatus | "all">("all");
+  const [selectedTripForDetails, setSelectedTripForDetails] = useState<Trip | null>(null);
 
   const filteredTrips = filterStatus === "all" 
     ? trips 
     : trips.filter(trip => trip.status === filterStatus);
 
-  const getStatusBadge = (status: TripStatus) => {
+  const getStatusBadge = (status: TripStatus, substatus?: PendingSubstatus) => {
     const config = statusConfig[status];
     
     // Safety check in case of invalid status
@@ -246,7 +320,7 @@ export function Dashboard() {
         </span>
         {config.label === "In Progress" && (
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border bg-amber-50 text-amber-700 border-amber-300">
-            Awaiting Quote
+            {substatus === "awaiting-confirmation" ? "Awaiting Payment" : "Awaiting Quote"}
           </span>
         )}
       </div>
@@ -367,7 +441,7 @@ export function Dashboard() {
                       <p className="text-xs text-gray-500">Ref: {trip.bookingReference}</p>
                     )}
                   </div>
-                  {getStatusBadge(trip.status)}
+                  {getStatusBadge(trip.status, trip.substatus)}
                 </div>
 
                 {/* Trip Details */}
@@ -438,9 +512,21 @@ export function Dashboard() {
                     <Button 
                       size="sm" 
                       className="flex-1"
-                      onClick={() => handleContinueTrip(trip)}
+                      onClick={() => {
+                        if (trip.substatus === "awaiting-confirmation") {
+                          navigate("/profile?section=payment");
+                        } else if (trip.status === "changes-requested") {
+                          handleContinueTrip(trip);
+                        } else {
+                          setSelectedTripForDetails(trip);
+                        }
+                      }}
                     >
-                      {trip.status === "changes-requested" ? "Update Details" : "Complete Details"}
+                      {trip.status === "changes-requested" 
+                        ? "Update Details" 
+                        : trip.substatus === "awaiting-confirmation" 
+                          ? "Pay Now" 
+                          : "View Details"}
                     </Button>
                   )}
                   {(trip.status === "approved" || trip.status === "done") && (
@@ -448,26 +534,43 @@ export function Dashboard() {
                       variant="outline" 
                       size="sm" 
                       className="flex-1"
+                      onClick={() => setSelectedTripForDetails(trip)}
                     >
                       View Details
                     </Button>
                   )}
-                  {trip.status !== "draft" && trip.status !== "in-progress" && (
+                  {trip.status !== "draft" && (
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => handleEditTrip(trip.id)}
+                      title="Edit trip details"
+                      onClick={() => {
+                        const tripData = {
+                          tripName: trip.tripName,
+                          startLocation: trip.startLocation,
+                          destination: trip.destination,
+                          dateRange: trip.dateRange,
+                          isFlexibleDates: trip.isFlexibleDates,
+                          selectedMonth: trip.selectedMonth,
+                          numberOfDays: trip.numberOfDays,
+                          passengers: trip.passengers,
+                        };
+                        sessionStorage.setItem("tripData", JSON.stringify(tripData));
+                        navigate("/select-vehicle");
+                      }}
                     >
                       <Edit className="size-4" />
                     </Button>
                   )}
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+                  {trip.status === "draft" && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  )}
                 </div>
 
                 {/* Created Date */}
@@ -480,6 +583,234 @@ export function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* Trip Details Dialog */}
+      <Dialog open={!!selectedTripForDetails} onOpenChange={(open) => !open && setSelectedTripForDetails(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedTripForDetails && (() => {
+            const tabs = selectedTripForDetails.tripTabs;
+            const isMultiTab = tabs && tabs.length > 1;
+
+            const renderTripLeg = (leg: {
+              startLocation: string;
+              destination: string;
+              additionalDestinations?: string[];
+              dateRange: { from: string | undefined; to: string | undefined };
+              isFlexibleDates: boolean;
+              selectedMonth: string;
+              numberOfDays: string;
+              passengers: string;
+              vehicleCount: number;
+              selectedVehicleNames?: string[];
+            }) => (
+              <div className="space-y-4">
+                {/* Route */}
+                <div className="flex items-start gap-3">
+                  <div className="mt-1">
+                    <MapPin className="size-5 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-gray-500 mb-1">Route</div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <div className="size-2 rounded-full bg-blue-600 flex-shrink-0"></div>
+                        <div className="font-medium text-gray-900">{leg.startLocation}</div>
+                      </div>
+                      {leg.additionalDestinations && leg.additionalDestinations.length > 0 && (
+                        leg.additionalDestinations.map((stop, i) => (
+                          <div key={i}>
+                            <div className="ml-[3px] border-l-2 border-dashed border-gray-300 h-4"></div>
+                            <div className="flex items-center gap-2">
+                              <div className="size-2 rounded-full bg-amber-400 flex-shrink-0"></div>
+                              <div className="text-sm text-gray-700">{stop}</div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                      <div className="ml-[3px] border-l-2 border-dashed border-gray-300 h-4"></div>
+                      <div className="flex items-center gap-2">
+                        <div className="size-2 rounded-full bg-green-600 flex-shrink-0"></div>
+                        <div className="font-medium text-gray-900">{leg.destination}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Date */}
+                <div className="flex items-start gap-3">
+                  <div className="mt-1">
+                    <Calendar className="size-5 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-gray-500 mb-1">Date & Time</div>
+                    <div className="font-medium text-gray-900">
+                      {leg.isFlexibleDates ? (
+                        `${leg.selectedMonth} (${leg.numberOfDays})`
+                      ) : leg.dateRange.from && leg.dateRange.to ? (
+                        <>
+                          {format(new Date(leg.dateRange.from), "EEEE, MMMM dd, yyyy")}
+                          {leg.dateRange.from !== leg.dateRange.to && (
+                            <> — {format(new Date(leg.dateRange.to), "EEEE, MMMM dd, yyyy")}</>
+                          )}
+                        </>
+                      ) : (
+                        "Date TBD"
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Passengers & Vehicles */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1">
+                      <Users className="size-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-500 mb-1">Passengers</div>
+                      <div className="font-medium text-gray-900">
+                        {leg.passengers} passenger{leg.passengers !== "1" ? "s" : ""}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1">
+                      <Car className="size-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-500 mb-1">Vehicle{leg.vehicleCount !== 1 ? "s" : ""}</div>
+                      <div className="font-medium text-gray-900">
+                        {leg.vehicleCount} vehicle{leg.vehicleCount !== 1 ? "s" : ""}
+                        {leg.selectedVehicleNames && leg.selectedVehicleNames.length > 0 && (
+                          <div className="text-sm text-gray-500 font-normal mt-0.5">
+                            {leg.selectedVehicleNames.join(", ")}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-bold">
+                    {selectedTripForDetails.tripName}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {selectedTripForDetails.bookingReference
+                      ? `Booking Reference: ${selectedTripForDetails.bookingReference}`
+                      : "Trip details and itinerary"}
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-6 py-4">
+                  {/* Status Badge */}
+                  <div className="flex justify-start">
+                    {getStatusBadge(selectedTripForDetails.status, selectedTripForDetails.substatus)}
+                  </div>
+
+                  {/* Trip Details Section */}
+                  {isMultiTab ? (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <h3 className="font-semibold text-gray-900">Trip Parts</h3>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">
+                          {tabs!.length} parts
+                        </span>
+                      </div>
+                      <Tabs defaultValue={tabs![0].tabId}>
+                        <TabsList className="w-full mb-4">
+                          {tabs!.map((tab, i) => (
+                            <TabsTrigger key={tab.tabId} value={tab.tabId} className="flex-1">
+                              Part {i + 1}
+                            </TabsTrigger>
+                          ))}
+                        </TabsList>
+                        {tabs!.map((tab) => (
+                          <TabsContent key={tab.tabId} value={tab.tabId}>
+                            <div className="bg-gray-50 rounded-lg p-5">
+                              {renderTripLeg(tab)}
+                            </div>
+                          </TabsContent>
+                        ))}
+                      </Tabs>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 rounded-lg p-6">
+                      <h3 className="font-semibold text-gray-900 mb-4">Trip Details</h3>
+                      {renderTripLeg({
+                        startLocation: selectedTripForDetails.startLocation,
+                        destination: selectedTripForDetails.destination,
+                        additionalDestinations: [],
+                        dateRange: selectedTripForDetails.dateRange,
+                        isFlexibleDates: selectedTripForDetails.isFlexibleDates,
+                        selectedMonth: selectedTripForDetails.selectedMonth,
+                        numberOfDays: selectedTripForDetails.numberOfDays,
+                        passengers: selectedTripForDetails.passengers,
+                        vehicleCount: selectedTripForDetails.vehicleCount,
+                      })}
+                    </div>
+                  )}
+
+                  {/* Pricing Section */}
+                  {selectedTripForDetails.totalPrice && (
+                    <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm text-gray-600 mb-1">Estimated Total</div>
+                          <div className="text-3xl font-bold text-blue-600">
+                            ${selectedTripForDetails.totalPrice}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Created Date */}
+                  <div className="flex items-center gap-2 text-sm text-gray-500 pt-4 border-t">
+                    <Clock className="size-4" />
+                    <span>
+                      Created on {format(new Date(selectedTripForDetails.createdAt), "MMMM dd, yyyy 'at' h:mm a")}
+                    </span>
+                  </div>
+                </div>
+
+                <DialogFooter className="gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedTripForDetails(null)}
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const trip = selectedTripForDetails;
+                      setSelectedTripForDetails(null);
+                      const tripData = {
+                        tripName: trip.tripName,
+                        startLocation: trip.startLocation,
+                        destination: trip.destination,
+                        dateRange: trip.dateRange,
+                        isFlexibleDates: trip.isFlexibleDates,
+                        selectedMonth: trip.selectedMonth,
+                        numberOfDays: trip.numberOfDays,
+                        passengers: trip.passengers,
+                      };
+                      sessionStorage.setItem("tripData", JSON.stringify(tripData));
+                      navigate("/select-vehicle");
+                    }}
+                  >
+                    Modify Trip
+                  </Button>
+                </DialogFooter>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

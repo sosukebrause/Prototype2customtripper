@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, redirect } from "react-router";
 import { CreateTripForm } from "./components/CreateTripForm";
 import { VehicleSelection } from "./components/VehicleSelection";
 import { BookingPage } from "./components/BookingPage";
@@ -26,6 +26,10 @@ export const router = createBrowserRouter([
   {
     path: "/dashboard",
     Component: Dashboard,
+  },
+  {
+    path: "/dashboards",
+    loader: () => redirect("/dashboard"),
   },
   {
     path: "/profile",

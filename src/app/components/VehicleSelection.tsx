@@ -843,19 +843,38 @@ function VehicleSelectionContent() {
           <div className="lg:col-span-1">
             {/* Tabs */}
             <div className="flex items-center gap-1 mb-2 bg-slate-700 p-1 rounded-t-lg">
-              {tabIds.map((tabId) => (
-                <button
-                  key={tabId}
-                  onClick={() => handleSwitchTab(tabId)}
-                  className={`px-4 py-2 text-sm rounded transition-colors ${
-                    activeTabId === tabId
-                      ? "bg-white text-gray-900"
-                      : "text-white hover:bg-slate-600"
-                  }`}
-                >
-                  {tripRecords[tabId]?.tripData.tripName || tripData.tripName}
-                </button>
-              ))}
+              {tabIds.map((tabId, tabIndex) => {
+                const isActive = activeTabId === tabId;
+                const tabRecord = tripRecords[tabId];
+                const vehicleCount = isActive
+                  ? Object.values(selectedVehicles).reduce((sum, qty) => sum + qty, 0)
+                  : tabRecord
+                  ? Object.values(tabRecord.selectedVehicles).reduce((sum, qty) => sum + qty, 0)
+                  : 0;
+                const hasVehicles = vehicleCount > 0;
+                return (
+                  <button
+                    key={tabId}
+                    onClick={() => handleSwitchTab(tabId)}
+                    className={`relative px-4 py-2 text-sm rounded transition-colors flex items-center gap-1.5 ${
+                      isActive
+                        ? "bg-white text-gray-900"
+                        : "text-white hover:bg-slate-600"
+                    }`}
+                  >
+                    {`Part ${tabIndex + 1}`}
+                    {hasVehicles && (
+                      <span
+                        className={`inline-flex items-center justify-center size-4 rounded-full text-[10px] font-semibold leading-none ${
+                          isActive ? "bg-green-500 text-white" : "bg-green-400 text-white"
+                        }`}
+                      >
+                        {vehicleCount}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
               <button
                 onClick={handleCreateNewTrip}
                 className="ml-auto size-8 flex items-center justify-center rounded hover:bg-slate-600 text-white transition-colors"
@@ -877,7 +896,7 @@ function VehicleSelectionContent() {
               )}
               
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">{tripData.tripName}</h2>
+                <h2 className="text-lg font-semibold">{`${tripRecords["trip-1"]?.tripData.tripName || tripData.tripName} - Part ${tabIds.indexOf(activeTabId) + 1}`}</h2>
                 {isDraftTab && (
                   <div className="flex gap-2">
                     <button
@@ -1303,6 +1322,20 @@ function VehicleSelectionContent() {
                 className="w-full md:w-auto"
                 disabled={Object.keys(selectedVehicles).length === 0}
                 onClick={() => {
+                  // Flush the currently-active tab's selections into tripRecords
+                  // before navigating – without this the last-active tab always
+                  // shows 0 vehicles on BookingPage because tab-switching is the
+                  // only other place that persists per-tab vehicle data.
+                  const updatedRecords = {
+                    ...tripRecords,
+                    [activeTabId]: {
+                      tripData,
+                      additionalDestinations,
+                      selectedVehicles,
+                    },
+                  };
+                  sessionStorage.setItem("tripRecords", JSON.stringify(updatedRecords));
+
                   sessionStorage.setItem("selectedVehicles", JSON.stringify(selectedVehicles));
                   sessionStorage.setItem("additionalDestinations", JSON.stringify(additionalDestinations));
                   sessionStorage.setItem("luggageCount", String(luggageCount));
