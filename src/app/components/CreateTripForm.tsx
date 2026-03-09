@@ -34,7 +34,7 @@ export function CreateTripForm() {
   const [passengers, setPassengers] = useState("1");
   
   // New state for the enhanced date picker
-  const [whenTab, setWhenTab] = useState<"specific" | "flexible" | "anytime">("flexible");
+  const [whenTab, setWhenTab] = useState<"specific" | "flexible" | "anytime">("specific");
   const [tourDuration, setTourDuration] = useState<string>("any");
   const [selectedYear, setSelectedYear] = useState(2026);
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
@@ -272,7 +272,7 @@ export function CreateTripForm() {
                           className="flex flex-col items-center justify-center h-auto py-3"
                           onClick={() => setTourDuration("any")}
                         >
-                          <div className="font-medium">Any duration</div>
+                          <div className="font-medium">Undecided</div>
                           <div className="text-xs text-muted-foreground mt-1">I'll decide later</div>
                         </Button>
                         <Button
@@ -292,15 +292,6 @@ export function CreateTripForm() {
                         >
                           <div className="font-medium">Medium stay</div>
                           <div className="text-xs text-muted-foreground mt-1">4 to 7 nights</div>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={tourDuration === "long" ? "default" : "outline"}
-                          className="flex flex-col items-center justify-center h-auto py-3"
-                          onClick={() => setTourDuration("long")}
-                        >
-                          <div className="font-medium">Long stay</div>
-                          <div className="text-xs text-muted-foreground mt-1">8+ nights</div>
                         </Button>
                       </div>
                     </div>
