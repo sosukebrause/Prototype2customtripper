@@ -237,7 +237,7 @@ const statusConfig = {
     icon: <AlertCircle className="size-3" />,
   },
   approved: {
-    label: "Approved",
+    label: "Confirmed",
     color: "bg-green-100 text-green-700",
     badgeColor: "bg-green-100 text-green-700 border-green-200",
     iconBg: "bg-green-500",
@@ -522,11 +522,7 @@ export function Dashboard() {
                         }
                       }}
                     >
-                      {trip.status === "changes-requested" 
-                        ? "Update Details" 
-                        : trip.substatus === "awaiting-confirmation" 
-                          ? "Pay Now" 
-                          : "View Details"}
+                      Continue
                     </Button>
                   )}
                   {(trip.status === "approved" || trip.status === "done") && (

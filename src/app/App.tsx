@@ -1,6 +1,7 @@
 import { RouterProvider } from "react-router";
 import { router } from "./routes";
 
+// Main application component
 export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 p-4">
